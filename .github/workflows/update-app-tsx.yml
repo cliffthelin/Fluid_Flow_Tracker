@@ -1,0 +1,25 @@
+name: Auto Update App.tsx
+
+on:
+  workflow_dispatch:  # This lets you trigger it manually from GitHub
+
+jobs:
+  update-file:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Decode and overwrite src/App.tsx
+        run: |
+          mkdir -p src
+          echo "${{ secrets.UPDATED_APP_TSX }}" | base64 --decode > src/App.tsx
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/App.tsx
+          git commit -m "Auto-update App.tsx via GitHub Action" || echo "No changes to commit"
+          git push
