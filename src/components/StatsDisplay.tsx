@@ -82,17 +82,15 @@ import React from 'react';
       // Only render if there are logs to calculate from
       if (logs.length === 0) {
         return (
-          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-gray-200 dark:border-gray-700 w-full max-w-4xl text-center">
+          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-gray-200 dark:border-gray-700 w-full text-center">
             <p className="text-gray-500 dark:text-gray-400">Log some measurements to see your stats here.</p>
           </div>
         );
       }
 
       return (
-        <div className="w-full max-w-4xl mb-8">
-          <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-4 text-center sm:text-left">
-            Average Flow Rates
-          </h2>
+        <div className="w-full">
+          {/* Removed the inner h2 heading */}
           <div className="flex flex-wrap justify-center sm:justify-start gap-4">
             {renderStatCard('Last 24 Hours', stats.daily.current, stats.daily.change, stats.daily.count)}
             {renderStatCard('Last 7 Days', stats.weekly.current, stats.weekly.change, stats.weekly.count)}

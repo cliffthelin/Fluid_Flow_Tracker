@@ -153,7 +153,7 @@ function App() {
 
         <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
           <button onClick={() => setShowStats(!showStats)} className="w-full flex justify-between items-center p-4 text-lg font-medium text-left text-gray-800 dark:text-gray-100 cursor-pointer transition hover:bg-gray-200 dark:hover:bg-gray-700">
-            Average Flow Rates
+            Your Average Flow Rates
             {showStats ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
           </button>
           {showStats && <div className="p-4"><StatsDisplay logs={logs} /></div>}
@@ -161,7 +161,7 @@ function App() {
 
         <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
           <button onClick={() => setShowAgeStats(!showAgeStats)} className="w-full flex justify-between items-center p-4 text-lg font-medium text-left text-gray-800 dark:text-gray-100 cursor-pointer transition hover:bg-gray-200 dark:hover:bg-gray-700">
-            Average Flow Rates by Age
+            Reference Flow Rates by Age
             {showAgeStats ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
           </button>
           {showAgeStats && (
