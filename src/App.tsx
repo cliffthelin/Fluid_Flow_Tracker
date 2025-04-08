@@ -16,9 +16,10 @@ function App() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [importError, setImportError] = useState<string | null>(null);
   const [showMeasurementForm, setShowMeasurementForm] = useState(true);
-  const [showAgeStats, setShowAgeStats] = useState(false);
   const [showStats, setShowStats] = useState(true);
   const [showLog, setShowLog] = useState(true);
+  const [showResources, setShowResources] = useState(true);
+  const [showAgeStats, setShowAgeStats] = useState(false);
 
   const handleSaveLog = useCallback((newEntry: LogEntry) => {
     setLogs(prevLogs => {
@@ -237,6 +238,21 @@ function App() {
                 </p>
               )}
               <LogTable logs={logs} onDelete={handleDeleteLog} />
+            </div>
+          )}
+        </div>
+
+        <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
+          <button onClick={() => setShowResources(!showResources)} className="w-full flex justify-between items-center p-4 text-lg font-medium text-left text-gray-800 dark:text-gray-100 cursor-pointer transition hover:bg-gray-200 dark:hover:bg-gray-700">
+            Helpful Resources
+            {showResources ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+          </button>
+          {showResources && (
+            <div className="p-4 space-y-3 text-gray-800 dark:text-gray-100 text-sm">
+              <p>• <a href="https://www.urologyhealth.org/urologic-conditions/urethral-stricture" className="underline text-blue-600 dark:text-blue-400" target="_blank">Urethral Stricture Overview - UrologyHealth.org</a></p>
+              <p>• <a href="https://www.mayoclinic.org/diseases-conditions/enlarged-prostate/symptoms-causes/syc-20370087" className="underline text-blue-600 dark:text-blue-400" target="_blank">Prostate Enlargement - Mayo Clinic</a></p>
+              <p>• <a href="https://www.uptodate.com/contents/search" className="underline text-blue-600 dark:text-blue-400" target="_blank">UpToDate: Medical References (Subscription)</a></p>
+              <p>• <a href="https://www.niddk.nih.gov/health-information/urologic-diseases/urinary-retention" className="underline text-blue-600 dark:text-blue-400" target="_blank">Urinary Retention - NIDDK</a></p>
             </div>
           )}
         </div>
