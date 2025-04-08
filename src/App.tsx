@@ -20,6 +20,8 @@ function App() {
   const [showLog, setShowLog] = useState(true);
   const [showResources, setShowResources] = useState(true);
   const [showAgeStats, setShowAgeStats] = useState(false);
+  const [customLink, setCustomLink] = useState('');
+  const [submitted, setSubmitted] = useState(false);
 
   const handleSaveLog = useCallback((newEntry: LogEntry) => {
     setLogs(prevLogs => {
@@ -27,8 +29,6 @@ function App() {
       return updatedLogs.sort((a, b) => {
         const dateA = new Date(`${a.date} ${a.timeOfDay}`);
         const dateB = new Date(`${b.date} ${b.timeOfDay}`);
-        if (isNaN(dateA.getTime())) return 1;
-        if (isNaN(dateB.getTime())) return -1;
         return dateB.getTime() - dateA.getTime();
       });
     });
@@ -54,9 +54,8 @@ function App() {
     event.target.value = '';
 
     if (file.type !== 'text/csv') {
-      const errorMsg = 'Invalid file type. Please select a CSV file.';
-      setImportError(errorMsg);
-      alert(errorMsg);
+      setImportError('Invalid file type. Please select a CSV file.');
+      alert('Invalid file type. Please select a CSV file.');
       return;
     }
 
@@ -64,9 +63,8 @@ function App() {
     reader.onload = async (e) => {
       const csvContent = e.target?.result as string;
       if (!csvContent) {
-        const errorMsg = 'Could not read file content.';
-        setImportError(errorMsg);
-        alert(errorMsg);
+        setImportError('Could not read file content.');
+        alert('Could not read file content.');
         return;
       }
       try {
@@ -77,8 +75,6 @@ function App() {
             return combinedLogs.sort((a, b) => {
               const dateA = new Date(`${a.date} ${a.timeOfDay}`);
               const dateB = new Date(`${b.date} ${b.timeOfDay}`);
-              if (isNaN(dateA.getTime())) return 1;
-              if (isNaN(dateB.getTime())) return -1;
               return dateB.getTime() - dateA.getTime();
             });
           });
@@ -87,25 +83,26 @@ function App() {
           alert('No new log entries were found in the selected file.');
         }
       } catch (error) {
-        const message = (typeof error === 'object' && error !== null && 'message' in error) ? (error as any).message : 'An unknown error occurred during import.';
+        const message = error instanceof Error ? error.message : 'An unknown error occurred during import.';
         setImportError(message);
         alert(`Import failed: ${message}`);
       }
     };
     reader.onerror = () => {
-      const errorMsg = 'Failed to read the file.';
-      setImportError(errorMsg);
-      alert(errorMsg);
+      setImportError('Failed to read the file.');
+      alert('Failed to read the file.');
     };
     reader.readAsText(file);
   }, [setLogs]);
 
-  const toggleManualForm = () => {
-    setShowManualForm(prev => !prev);
-  };
-
-  const handleCancelManualForm = () => {
-    setShowManualForm(false);
+  const toggleManualForm = () => setShowManualForm(prev => !prev);
+  const handleCancelManualForm = () => setShowManualForm(false);
+  const handleSubmitLink = () => {
+    if (customLink.trim()) {
+      setSubmitted(true);
+      alert('Your link has been submitted for review.');
+      setCustomLink('');
+    }
   };
 
   return (
@@ -138,10 +135,7 @@ function App() {
               {!showManualForm ? (
                 <>
                   <MeasurementForm onSave={handleSaveLog} />
-                  <button
-                    onClick={toggleManualForm}
-                    className="mt-4 flex items-center justify-center px-5 py-2.5 bg-purple-600 dark:bg-purple-700 text-white font-medium rounded-md shadow-sm hover:bg-purple-700 dark:hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition duration-150 ease-in-out"
-                  >
+                  <button onClick={toggleManualForm} className="mt-4 flex items-center justify-center px-5 py-2.5 bg-purple-600 dark:bg-purple-700 text-white font-medium rounded-md shadow-sm hover:bg-purple-700 dark:hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition duration-150 ease-in-out">
                     <PlusCircle size={20} className="mr-2" /> Add Manual Entry
                   </button>
                 </>
@@ -162,7 +156,7 @@ function App() {
 
         <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
           <button onClick={() => setShowAgeStats(!showAgeStats)} className="w-full flex justify-between items-center p-4 text-lg font-medium text-left text-gray-800 dark:text-gray-100 cursor-pointer transition hover:bg-gray-200 dark:hover:bg-gray-700">
-            Reference Flow Rates by Age
+            Average Flow Rates by Age
             {showAgeStats ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
           </button>
           {showAgeStats && (
@@ -198,7 +192,7 @@ function App() {
             </div>
           )}
         </div>
-
+				
         <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
           <button onClick={() => setShowLog(!showLog)} className="w-full flex justify-between items-center p-4 text-lg font-medium text-left text-gray-800 dark:text-gray-100 cursor-pointer transition hover:bg-gray-200 dark:hover:bg-gray-700">
             Measurement Log
@@ -248,19 +242,36 @@ function App() {
             {showResources ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
           </button>
           {showResources && (
-            <div className="p-4 space-y-3 text-gray-800 dark:text-gray-100 text-sm">
-              <p>• <a href="https://www.urologyhealth.org/urologic-conditions/urethral-stricture" className="underline text-blue-600 dark:text-blue-400" target="_blank">Urethral Stricture Overview - UrologyHealth.org</a></p>
-              <p>• <a href="https://www.mayoclinic.org/diseases-conditions/enlarged-prostate/symptoms-causes/syc-20370087" className="underline text-blue-600 dark:text-blue-400" target="_blank">Prostate Enlargement - Mayo Clinic</a></p>
-              <p>• <a href="https://www.uptodate.com/contents/search" className="underline text-blue-600 dark:text-blue-400" target="_blank">UpToDate: Medical References (Subscription)</a></p>
-              <p>• <a href="https://www.niddk.nih.gov/health-information/urologic-diseases/urinary-retention" className="underline text-blue-600 dark:text-blue-400" target="_blank">Urinary Retention - NIDDK</a></p>
+            <div className="p-4 text-sm text-gray-800 dark:text-gray-100 space-y-4">
+              <ul className="list-disc list-inside space-y-1">
+                <li><a href="https://www.urologyhealth.org/urologic-conditions/urethral-stricture" className="text-blue-600 dark:text-blue-400 underline" target="_blank" rel="noopener noreferrer">Urethral Stricture Overview - UrologyHealth.org</a></li>
+                <li><a href="https://www.mayoclinic.org/diseases-conditions/benign-prostatic-hyperplasia/symptoms-causes/syc-20370087" className="text-blue-600 dark:text-blue-400 underline" target="_blank" rel="noopener noreferrer">Prostate Enlargement - Mayo Clinic</a></li>
+                <li><a href="https://www.uptodate.com/" className="text-blue-600 dark:text-blue-400 underline" target="_blank" rel="noopener noreferrer">UpToDate: Medical References (Subscription)</a></li>
+                <li><a href="https://www.niddk.nih.gov/health-information/urologic-diseases/urinary-retention" className="text-blue-600 dark:text-blue-400 underline" target="_blank" rel="noopener noreferrer">Urinary Retention - NIDDK</a></li>
+                <li><a href="https://www.healthline.com/health/urethral-stricture#treatment" className="text-blue-600 dark:text-blue-400 underline" target="_blank" rel="noopener noreferrer">Lifestyle & Diet Tips - Healthline</a></li>
+              </ul>
+              <div className="mt-6">
+                <label htmlFor="custom-link" className="block font-medium mb-1">Have a helpful link to share?</label>
+                <input
+                  type="text"
+                  id="custom-link"
+                  value={customLink}
+                  onChange={(e) => setCustomLink(e.target.value)}
+                  className="w-full p-2 rounded bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-sm text-gray-900 dark:text-gray-100 mb-2"
+                  placeholder="https://example.com"
+                />
+                <button
+                  onClick={handleSubmitLink}
+                  className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded hover:bg-indigo-700 transition"
+                >
+                  Submit for Review
+                </button>
+                {submitted && <p className="text-green-600 text-sm mt-2">Thank you! Your link has been submitted for review.</p>}
+              </div>
             </div>
           )}
         </div>
       </main>
-
-      <footer className="mt-16 text-center text-gray-500 dark:text-gray-400 text-sm">
-        <p>&copy; {new Date().getFullYear()} Flow Tracker. Track responsibly.</p>
-      </footer>
     </div>
   );
 }
